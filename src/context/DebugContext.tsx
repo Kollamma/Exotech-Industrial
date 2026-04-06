@@ -29,17 +29,19 @@ export const useDebug = () => {
   return context;
 };
 
-export const DebugLabel = ({ label, children, className = "" }: { label: string; children: React.ReactNode; className?: string }) => {
-  const { debugMode } = useDebug();
+export const DebugLabel = React.forwardRef<HTMLDivElement, { label: string; children: React.ReactNode; className?: string }>(
+  ({ label, children, className = "" }, ref) => {
+    const { debugMode } = useDebug();
 
-  return (
-    <div className={`relative ${className}`}>
-      {debugMode && (
-        <div className="absolute -top-2 -left-2 z-[9999] bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded-sm font-mono uppercase pointer-events-none whitespace-nowrap border border-white/20 shadow-lg">
-          {label}
-        </div>
-      )}
-      {children}
-    </div>
-  );
-};
+    return (
+      <div className={`relative ${className}`} ref={ref}>
+        {debugMode && (
+          <div className="absolute -top-2 -left-2 z-[9999] bg-blue-600 text-white text-[8px] px-1 py-0.5 rounded-sm font-mono uppercase pointer-events-none whitespace-nowrap border border-white/20 shadow-lg">
+            {label}
+          </div>
+        )}
+        {children}
+      </div>
+    );
+  }
+);

@@ -6,6 +6,7 @@ interface Rift {
   system_id: string;
   type: string;
   created_at: string;
+  username?: string;
   user?: {
     username: string;
   };
@@ -59,12 +60,9 @@ export const RiftAlert = () => {
     socket.on("rift_update", () => {
       fetchLatestRift();
     });
-    
-    const interval = setInterval(fetchLatestRift, 60000);
 
     return () => {
       socket.disconnect();
-      clearInterval(interval);
     };
   }, []);
 
@@ -113,7 +111,7 @@ export const RiftAlert = () => {
         <div className={`absolute bottom-0 left-0 w-1.5 h-1.5 border-b-2 border-l-2 ${alertStyles.accent}`}></div>
         <div className={`absolute bottom-0 right-0 w-1.5 h-1.5 border-b-2 border-r-2 ${alertStyles.accent}`}></div>
         <span className="text-[10px] font-bold uppercase tracking-[0.15em] relative z-10 whitespace-nowrap">
-          Rift Type {latestRift.type} found in {latestRift.system_id} by {latestRift.user?.username || "Unknown"}, {hoursAgo} hours ago!
+          Rift Type {latestRift.type} found in {latestRift.system_id} by {latestRift.username || latestRift.user?.username || "Unknown"}, {hoursAgo} hours ago!
         </span>
       </div>
     </div>

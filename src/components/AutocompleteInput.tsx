@@ -6,6 +6,7 @@ interface AutocompleteInputProps {
   placeholder?: string;
   className?: string;
   maxLength?: number;
+  disabled?: boolean;
 }
 
 export const AutocompleteInput = ({ 
@@ -13,7 +14,8 @@ export const AutocompleteInput = ({
   onChange, 
   placeholder, 
   className, 
-  maxLength 
+  maxLength,
+  disabled
 }: AutocompleteInputProps) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -58,9 +60,10 @@ export const AutocompleteInput = ({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value.toUpperCase())}
-        onFocus={() => value.length >= 3 && suggestions.length > 0 && setShowSuggestions(true)}
+        onFocus={() => !disabled && value.length >= 3 && suggestions.length > 0 && setShowSuggestions(true)}
         placeholder={placeholder}
         maxLength={maxLength}
+        disabled={disabled}
         className={className}
       />
       {showSuggestions && (

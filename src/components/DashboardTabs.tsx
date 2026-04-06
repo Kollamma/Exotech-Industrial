@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ScoutTab } from "./tabs/ScoutTab";
 import { OperationTab } from "./tabs/OperationTab";
 import { RouteTab } from "./tabs/RouteTab";
+import { AtlasTab } from "./tabs/AtlasTab";
 import { ManifestTab } from "./tabs/ManifestTab";
 import { LogisticTab } from "./tabs/LogisticTab";
 import { IntelTab } from "./tabs/IntelTab";
@@ -10,12 +11,14 @@ import { LoadingState } from "./LoadingState";
 import { DebugLabel } from "../context/DebugContext";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { MobileHome } from "./MobileHome";
 
 const tabs = [
-  { name: "Scout", component: ScoutTab },
-  { name: "Operation", component: OperationTab },
-  { name: "Route", component: RouteTab },
-  { name: "Manifest", component: ManifestTab },
+  { name: "Scouting", component: ScoutTab },
+  { name: "Operations", component: OperationTab },
+  { name: "Route-Planner", component: RouteTab },
+  { name: "Map", component: AtlasTab },
+  { name: "Wallet", component: ManifestTab },
   { name: "Logistic", component: LogisticTab },
   { name: "Intel", component: IntelTab },
   { name: "Tribe", component: TribeTab },
@@ -23,10 +26,10 @@ const tabs = [
 
 export const DashboardTabs = ({ user, onUpdate }: { user: any; onUpdate?: (data: any) => void }) => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
-  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['Scout', 'Operation', 'Route', 'Manifest', 'Logistic']));
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['Scouting', 'Operations', 'Route-Planner', 'Map', 'Wallet', 'Logistic']));
   const [isLoading, setIsLoading] = useState(false);
   const [tabData, setTabData] = useState<any>(null);
-  const [mobileView, setMobileView] = useState<"home" | "scout" | "manifest">("home");
+  const [mobileView, setMobileView] = useState<"home" | "scouting" | "wallet">("home");
 
   const ActiveComponent = activeTab.component;
 
@@ -55,59 +58,6 @@ export const DashboardTabs = ({ user, onUpdate }: { user: any; onUpdate?: (data:
     }
   };
 
-  const MobileHome = () => (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-accent/20">
-        <div className="w-5" />
-        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-text-main italic">Log personal data</h2>
-        <button onClick={() => setMobileView("scout")} className="text-text-dim">
-          <ChevronRight size={20} />
-        </button>
-      </div>
-      
-      <div className="flex flex-col items-center justify-center flex-grow space-y-8 p-6">
-        <div className="w-full space-y-6">
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-[0.2em] text-text-dim">Ship Class</label>
-            <select 
-              value={user.ship_type || "Wend"} 
-              onChange={(e) => onUpdate?.({ ship_type: e.target.value })}
-              className="w-full bg-bg-main border border-accent/30 p-3 text-sm font-bold text-text-main uppercase tracking-widest outline-none focus:border-accent"
-            >
-              {["Wend", "Reflex", "Reiver", "USV", "Tades", "Maul"].map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-[0.2em] text-text-dim">Industry Level</label>
-            <select 
-              value={user.industry_class || "Tutorial"} 
-              onChange={(e) => onUpdate?.({ industry_class: e.target.value })}
-              className="w-full bg-bg-main border border-accent/30 p-3 text-sm font-bold text-text-main uppercase tracking-widest outline-none focus:border-accent"
-            >
-              {["Tutorial", "Network Node / Refinery", "Mini-Berth / Mini-Printer", "Berth / Printer", "Heavy Refinery", "Heavy Berth"].map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-[0.2em] text-text-dim">Home System</label>
-            <input 
-              type="text"
-              value={user.home_system || ""}
-              onChange={(e) => onUpdate?.({ home_system: e.target.value })}
-              placeholder="UNDEFINED"
-              className="w-full bg-bg-main border border-accent/30 p-3 text-sm font-bold text-text-main uppercase tracking-widest outline-none focus:border-accent placeholder:text-zinc-700"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <DebugLabel label="Dashboard Container" className="w-full h-full">
       {/* Mobile View */}
@@ -121,12 +71,12 @@ export const DashboardTabs = ({ user, onUpdate }: { user: any; onUpdate?: (data:
               exit={{ opacity: 0, x: -20 }}
               className="h-full"
             >
-              <MobileHome />
+              <MobileHome user={user} onUpdate={onUpdate} setMobileView={setMobileView} />
             </motion.div>
           )}
-          {mobileView === "scout" && (
+          {mobileView === "scouting" && (
             <motion.div
-              key="mobile-scout"
+              key="mobile-scouting"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
@@ -137,7 +87,7 @@ export const DashboardTabs = ({ user, onUpdate }: { user: any; onUpdate?: (data:
                   <ChevronLeft size={20} />
                 </button>
                 <h2 className="text-sm font-black uppercase tracking-[0.2em] text-text-main italic">Scouting</h2>
-                <button onClick={() => setMobileView("manifest")} className="text-text-dim">
+                <button onClick={() => setMobileView("wallet")} className="text-text-dim">
                   <ChevronRight size={20} />
                 </button>
               </div>
@@ -146,19 +96,19 @@ export const DashboardTabs = ({ user, onUpdate }: { user: any; onUpdate?: (data:
               </div>
             </motion.div>
           )}
-          {mobileView === "manifest" && (
+          {mobileView === "wallet" && (
             <motion.div
-              key="mobile-manifest"
+              key="mobile-wallet"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className="h-full flex flex-col"
             >
               <div className="flex items-center justify-between p-4 border-b border-accent/20">
-                <button onClick={() => setMobileView("scout")} className="text-text-dim">
+                <button onClick={() => setMobileView("scouting")} className="text-text-dim">
                   <ChevronLeft size={20} />
                 </button>
-                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-text-main italic">Manifest</h2>
+                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-text-main italic">Wallet</h2>
                 <div className="w-5" />
               </div>
               <div className="flex-grow overflow-y-auto">

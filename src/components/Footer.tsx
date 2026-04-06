@@ -1,4 +1,4 @@
-import { Cpu, Database, ShieldCheck, Bug, Settings, Eye } from "lucide-react";
+import { Cpu, Database, ShieldCheck, Bug, Settings, Eye, Zap } from "lucide-react";
 import { DebugLabel, useDebug } from "../context/DebugContext";
 import { useTheme } from "../context/ThemeContext";
 
@@ -7,6 +7,20 @@ export const Footer = ({ user, onOpenUserManagement, onLogout }: { user: any; on
   const { theme, toggleTheme } = useTheme();
 
   const isSuperadmin = user && user.rank >= 2;
+
+  const handleRiftTest = async () => {
+    try {
+      const res = await fetch("/api/discord/rift-test", { method: "POST" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to send rift test");
+      }
+      alert("Rifthunter test message sent!");
+    } catch (e: any) {
+      console.error(e);
+      alert(`Error: ${e.message}`);
+    }
+  };
 
   return (
     <DebugLabel label="Footer Container" className="fixed bottom-0 left-0 w-full px-6 py-0.5 z-20 border-t border-accent/20 bg-bg-main/80 backdrop-blur-md">
@@ -52,6 +66,16 @@ export const Footer = ({ user, onOpenUserManagement, onLogout }: { user: any; on
               title={`Switch Theme (Current: ${theme})`}
             >
               <Eye size={14} />
+            </button>
+          </DebugLabel>
+
+          <DebugLabel label="Rift Test">
+            <button
+              onClick={handleRiftTest}
+              className="p-1.5 rounded-full transition-all duration-300 bg-purple-900/20 text-purple-400 hover:bg-purple-900/40"
+              title="Rift Hunter Test"
+            >
+              <Zap size={14} />
             </button>
           </DebugLabel>
 
