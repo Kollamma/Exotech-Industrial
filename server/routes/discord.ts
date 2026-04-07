@@ -1,8 +1,24 @@
 import { Router } from "express";
 import axios from "axios";
 import { verifySession } from "../middleware";
+import { getDiscordLogs, isDiscordBotDisabled, setDiscordDisabled } from "../discordBot";
 
 export const discordRouter = Router();
+
+// API Route to get Discord bot logs (for development monitoring)
+discordRouter.get("/dev/logs", verifySession, (req, res) => {
+  res.json({
+    logs: getDiscordLogs(),
+    disabled: isDiscordBotDisabled()
+  });
+});
+
+// API Route to toggle Discord bot state (for development monitoring)
+discordRouter.post("/dev/toggle", verifySession, (req, res) => {
+  const { disabled } = req.body;
+  setDiscordDisabled(disabled);
+  res.json({ success: true, disabled: isDiscordBotDisabled() });
+});
 
 // API Route to get Discord roles (for rifthunter toggle)
 discordRouter.get("/roles", verifySession, async (req: any, res) => {

@@ -53,7 +53,7 @@ export const useAtlasData = (user: any, CELL_SIZE: number, PADDING: number) => {
     setLoading(true);
     try {
       const url = snapshotId ? `/api/atlas/map?snapshot_id=${snapshotId}` : '/api/atlas/map';
-      const res = await fetch(url);
+      const res = await fetch(url, { credentials: 'include' });
       const result = await res.json();
       if (result.success && result.data) {
         setSystems(result.data.systems || []);
@@ -77,7 +77,7 @@ export const useAtlasData = (user: any, CELL_SIZE: number, PADDING: number) => {
 
   const fetchSnapshots = async () => {
     try {
-      const res = await fetch('/api/atlas/snapshots');
+      const res = await fetch('/api/atlas/snapshots', { credentials: 'include' });
       const result = await res.json();
       if (result.success) {
         setSnapshots(result.data);
@@ -130,7 +130,8 @@ export const useAtlasData = (user: any, CELL_SIZE: number, PADDING: number) => {
           system_name: targetSystem, 
           direction,
           current_systems: systems 
-        })
+        }),
+        credentials: 'include'
       });
       if (!res.ok) throw new Error("Extrapolation failed");
       const result = await res.json();
@@ -178,7 +179,8 @@ export const useAtlasData = (user: any, CELL_SIZE: number, PADDING: number) => {
           map_name: mapTitle, 
           map_data: { systems, connections },
           is_draft: true
-        })
+        }),
+        credentials: 'include'
       });
       if (!res.ok) throw new Error("Draft save failed");
       const result = await res.json();
@@ -205,7 +207,8 @@ export const useAtlasData = (user: any, CELL_SIZE: number, PADDING: number) => {
       const res = await fetch('/api/atlas/set-default', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ map_name: currentMapRef })
+        body: JSON.stringify({ map_name: currentMapRef }),
+        credentials: 'include'
       });
       if (!res.ok) throw new Error("Failed to set default");
       toast.success("DEFAULT MAP UPDATED");

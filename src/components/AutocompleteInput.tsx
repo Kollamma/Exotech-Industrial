@@ -25,7 +25,7 @@ export const AutocompleteInput = ({
     const fetchSuggestions = async () => {
       if (value.length >= 3) {
         try {
-          const res = await fetch(`/api/systems/search?q=${encodeURIComponent(value)}`);
+          const res = await fetch(`/api/systems/search?q=${encodeURIComponent(value)}`, { credentials: 'include' });
           if (res.ok) {
             const data = await res.json();
             setSuggestions(data);

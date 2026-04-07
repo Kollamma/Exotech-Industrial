@@ -14,7 +14,7 @@ export const ManifestTab = ({ user, initialData, isMobile }: { user: any; initia
 
   const fetchManifest = async () => {
     try {
-      const res = await fetch("/api/manifest");
+      const res = await fetch("/api/manifest", { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
         setManifestLogs(data);
@@ -30,7 +30,7 @@ export const ManifestTab = ({ user, initialData, isMobile }: { user: any; initia
 
   const fetchStock = async () => {
     try {
-      const res = await fetch("/api/manifest/stock");
+      const res = await fetch("/api/manifest/stock", { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
         setStockData(data);
@@ -46,7 +46,7 @@ export const ManifestTab = ({ user, initialData, isMobile }: { user: any; initia
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("/api/users");
+      const res = await fetch("/api/users", { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
         setAllUsers(data);
@@ -62,7 +62,7 @@ export const ManifestTab = ({ user, initialData, isMobile }: { user: any; initia
 
   const fetchGates = async () => {
     try {
-      const res = await fetch("/api/gates");
+      const res = await fetch("/api/gates", { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
         setGates(data);
@@ -97,7 +97,10 @@ export const ManifestTab = ({ user, initialData, isMobile }: { user: any; initia
   const handleVerify = async (id: string) => {
     if (!isAdmin) return;
     try {
-      const res = await fetch(`/api/manifest/verify/${id}`, { method: "POST" });
+      const res = await fetch(`/api/manifest/verify/${id}`, { 
+        method: "POST",
+        credentials: 'include'
+      });
       if (!res.ok) throw new Error("Verification failed");
     } catch (e) {
       console.error(e);

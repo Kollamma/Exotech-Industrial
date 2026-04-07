@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { Trash2, XCircle } from "lucide-react";
 import { CornerAccents } from "./scout/ScoutUI";
 import { BroadcastModule } from "./scout/BroadcastModule";
-import { IsolateModule } from "./scout/IsolateModule";
+import { ReportRiftModule } from "./scout/ReportRiftModule";
 import { VectorRepository } from "./scout/VectorRepository";
 import { ReportedRifts } from "./scout/ReportedRifts";
 
@@ -18,7 +18,7 @@ export const ScoutTab = ({ isMobile = false, user, initialData }: { isMobile?: b
   const fetchScouts = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/scouts');
+      const res = await fetch('/api/scouts', { credentials: 'include' });
       if (!res.ok) throw new Error("Failed to fetch scouts");
       const data = await res.json();
       setScouts(data);
@@ -33,7 +33,7 @@ export const ScoutTab = ({ isMobile = false, user, initialData }: { isMobile?: b
 
   const fetchRifts = async () => {
     try {
-      const res = await fetch('/api/rifts');
+      const res = await fetch('/api/rifts', { credentials: 'include' });
       if (!res.ok) throw new Error("Failed to fetch rifts");
       const data = await res.json();
       setRifts(data);
@@ -45,7 +45,10 @@ export const ScoutTab = ({ isMobile = false, user, initialData }: { isMobile?: b
 
   const handleDeleteRift = async (id: string) => {
     try {
-      const res = await fetch(`/api/rifts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/rifts/${id}`, { 
+        method: 'DELETE',
+        credentials: 'include'
+      });
       if (!res.ok) throw new Error("Delete failed");
       setRiftToDelete(null);
       fetchRifts();
@@ -85,9 +88,9 @@ export const ScoutTab = ({ isMobile = false, user, initialData }: { isMobile?: b
             if (isLoaded) fetchScouts();
           }} 
         />
-        <IsolateModule 
+        <ReportRiftModule 
           isMobile={true} 
-          onIsolateSuccess={() => fetchRifts()} 
+          onReportSuccess={() => fetchRifts()} 
         />
       </div>
     );
@@ -101,8 +104,8 @@ export const ScoutTab = ({ isMobile = false, user, initialData }: { isMobile?: b
             if (isLoaded) fetchScouts();
           }} 
         />
-        <IsolateModule 
-          onIsolateSuccess={() => fetchRifts()} 
+        <ReportRiftModule 
+          onReportSuccess={() => fetchRifts()} 
         />
       </div>
 

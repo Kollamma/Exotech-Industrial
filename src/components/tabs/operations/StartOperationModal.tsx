@@ -40,7 +40,8 @@ export const StartOperationModal = ({ isOpen, onClose, onCreated, currentUser }:
           operation_type: operationType,
           system_id: systemId,
           description: description
-        })
+        }),
+        credentials: 'include'
       });
 
       if (res.ok) {

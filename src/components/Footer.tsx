@@ -1,16 +1,22 @@
-import { Cpu, Database, ShieldCheck, Bug, Settings, Eye, Zap } from "lucide-react";
+import { Cpu, Database, ShieldCheck, Bug, Settings, Eye, Zap, Terminal } from "lucide-react";
 import { DebugLabel, useDebug } from "../context/DebugContext";
 import { useTheme } from "../context/ThemeContext";
+import { DiscordDevLogModal } from "./DiscordDevLogModal";
+import { useState } from "react";
 
 export const Footer = ({ user, onOpenUserManagement, onLogout }: { user: any; onOpenUserManagement: () => void; onLogout: () => void }) => {
   const { debugMode, toggleDebugMode } = useDebug();
   const { theme, toggleTheme } = useTheme();
+  const [isDiscordLogOpen, setIsDiscordLogOpen] = useState(false);
 
   const isSuperadmin = user && user.rank >= 2;
 
   const handleRiftTest = async () => {
     try {
-      const res = await fetch("/api/discord/rift-test", { method: "POST" });
+      const res = await fetch("/api/discord/rift-test", { 
+        method: "POST",
+        credentials: 'include'
+      });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to send rift test");
@@ -69,6 +75,16 @@ export const Footer = ({ user, onOpenUserManagement, onLogout }: { user: any; on
             </button>
           </DebugLabel>
 
+          <DebugLabel label="Discord Log">
+            <button
+              onClick={() => setIsDiscordLogOpen(true)}
+              className="p-1.5 rounded-full transition-all duration-300 bg-blue-900/20 text-blue-400 hover:bg-blue-900/40"
+              title="Discord Interaction Monitor"
+            >
+              <Terminal size={14} />
+            </button>
+          </DebugLabel>
+
           <DebugLabel label="Rift Test">
             <button
               onClick={handleRiftTest}
@@ -105,6 +121,10 @@ export const Footer = ({ user, onOpenUserManagement, onLogout }: { user: any; on
           </DebugLabel>
         </div>
       </footer>
+      <DiscordDevLogModal 
+        isOpen={isDiscordLogOpen} 
+        onClose={() => setIsDiscordLogOpen(false)} 
+      />
     </DebugLabel>
   );
 };

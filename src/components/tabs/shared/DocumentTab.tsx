@@ -103,7 +103,7 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
   const isSuperAdmin = user && user.rank === 2;
 
   const fetchTabs = async () => {
-    const res = await fetch(apiEndpoint);
+    const res = await fetch(apiEndpoint, { credentials: 'include' });
     const data = await res.json();
     setTabs(data);
     if (data.length > 0 && !activeSubTab) setActiveSubTab(data[0].id);
@@ -144,7 +144,8 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
     await fetch(`${apiEndpoint}/${tab.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_locked: true, locked_by: user.uid, locked_at: new Date().toISOString() })
+      body: JSON.stringify({ is_locked: true, locked_by: user.uid, locked_at: new Date().toISOString() }),
+      credentials: 'include'
     });
 
     setEditingTab(tab.id);
@@ -157,7 +158,8 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
     await fetch(`${apiEndpoint}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: editTitle, content: editor?.getJSON(), is_locked: false, locked_by: null, locked_at: null })
+      body: JSON.stringify({ title: editTitle, content: editor?.getJSON(), is_locked: false, locked_by: null, locked_at: null }),
+      credentials: 'include'
     });
     setEditingTab(null);
     setActiveSubTab(id);
@@ -169,7 +171,8 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
     await fetch(apiEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newTab)
+      body: JSON.stringify(newTab),
+      credentials: 'include'
     });
     fetchTabs();
   };
@@ -186,7 +189,8 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
         await fetch(`${apiEndpoint}/${newTabs[i].id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ position: i })
+          body: JSON.stringify({ position: i }),
+          credentials: 'include'
         });
       }
     }
@@ -203,7 +207,8 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
     await fetch(`${apiEndpoint}/${contextMenu.tabId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ visible: false })
+      body: JSON.stringify({ visible: false }),
+      credentials: 'include'
     });
     setContextMenu(null);
     fetchTabs();
@@ -213,7 +218,8 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
     await fetch(`${apiEndpoint}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ visible: true })
+      body: JSON.stringify({ visible: true }),
+      credentials: 'include'
     });
     fetchTabs();
   };
@@ -221,7 +227,8 @@ export const DocumentTab = ({ user, initialData, apiEndpoint, moduleLabel }: Doc
   const deleteTabPermanently = async (id: string) => {
     if (!confirm("Are you sure you want to delete this tab forever?")) return;
     await fetch(`${apiEndpoint}/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      credentials: 'include'
     });
     if (activeSubTab === id) setActiveSubTab(null);
     fetchTabs();

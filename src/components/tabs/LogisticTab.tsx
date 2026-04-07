@@ -129,7 +129,8 @@ export const LogisticTab = ({ user, initialData }: { user?: any; initialData?: a
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(gateForm)
+        body: JSON.stringify(gateForm),
+        credentials: 'include'
       });
 
       if (res.ok) {
@@ -142,7 +143,8 @@ export const LogisticTab = ({ user, initialData }: { user?: any; initialData?: a
               body: JSON.stringify({
                 ...targetGate,
                 connected_to: gateForm.name
-              })
+              }),
+              credentials: 'include'
             });
           }
         }
@@ -162,7 +164,8 @@ export const LogisticTab = ({ user, initialData }: { user?: any; initialData?: a
 
     try {
       const res = await fetch(`/api/gates/${editGateId}`, {
-        method: "DELETE"
+        method: "DELETE",
+        credentials: 'include'
       });
 
       if (res.ok) {
@@ -204,7 +207,8 @@ export const LogisticTab = ({ user, initialData }: { user?: any; initialData?: a
           gate_name: gate.name,
           amount: amount,
           donor_uid: selectedDonor.uid
-        })
+        }),
+        credentials: 'include'
       });
 
       if (res.ok) {

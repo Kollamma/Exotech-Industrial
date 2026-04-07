@@ -112,7 +112,7 @@ operationsRouter.post("/:id/contribute", verifySession, async (req: any, res) =>
 
     if (fetchError) throw fetchError;
 
-    const contributions = op.contributions ? JSON.parse(op.contributions) : [];
+    const contributions = typeof op.contributions === 'string' ? JSON.parse(op.contributions) : (op.contributions || []);
     contributions.push({
       id: Math.random().toString(36).substr(2, 9),
       uid,
@@ -124,7 +124,7 @@ operationsRouter.post("/:id/contribute", verifySession, async (req: any, res) =>
 
     const { data, error } = await supabaseAdmin
       .from("operations")
-      .update({ contributions: JSON.stringify(contributions) })
+      .update({ contributions: contributions })
       .eq("id", id)
       .select()
       .single();
@@ -146,7 +146,7 @@ operationsRouter.post("/:id/contributions/:contributionId/confirm", verifySessio
     const { data: user } = await supabaseAdmin.from("users").select("rank").eq("uid", uid).single();
     const { data: op, error: fetchError } = await supabaseAdmin
       .from("operations")
-      .select("*")
+      .select("*, operation_number")
       .eq("id", id)
       .single();
 
@@ -156,7 +156,7 @@ operationsRouter.post("/:id/contributions/:contributionId/confirm", verifySessio
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    const contributions = op.contributions ? JSON.parse(op.contributions) : [];
+    const contributions = typeof op.contributions === 'string' ? JSON.parse(op.contributions) : (op.contributions || []);
     const contributionIndex = contributions.findIndex((c: any) => c.id === contributionId);
 
     if (contributionIndex === -1) return res.status(404).json({ error: "Contribution not found" });
@@ -168,7 +168,7 @@ operationsRouter.post("/:id/contributions/:contributionId/confirm", verifySessio
     // 1. Update the operation contributions
     const { data: updatedOp, error: updateError } = await supabaseAdmin
       .from("operations")
-      .update({ contributions: JSON.stringify(contributions) })
+      .update({ contributions: contributions })
       .eq("id", id)
       .select()
       .single();

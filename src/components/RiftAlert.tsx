@@ -24,7 +24,7 @@ export const RiftAlert = () => {
 
   const fetchLatestRift = async () => {
     try {
-      const res = await fetch('/api/rifts');
+      const res = await fetch('/api/rifts', { credentials: 'include' });
       const data = await res.json();
       if (data && data.length > 0) {
         const now = new Date().getTime();

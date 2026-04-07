@@ -21,7 +21,7 @@ export const BroadcastModule = ({
     if (!hasChecked && systemId.trim()) {
       setHasChecked(true);
       try {
-        const res = await fetch(`/api/scouts/${systemId}`);
+        const res = await fetch(`/api/scouts/${systemId}`, { credentials: 'include' });
         const data = await res.json();
         if (data && data.system_id) {
           setAlreadyScouted(true);
@@ -72,7 +72,8 @@ export const BroadcastModule = ({
           system_id: systemId,
           site_contents: encoded,
           system_strength: totalStrength
-        })
+        }),
+        credentials: 'include'
       });
 
       if (!res.ok) throw new Error("Broadcast failed");

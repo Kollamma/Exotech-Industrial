@@ -42,7 +42,7 @@ export const DashboardTabs = ({ user, onUpdate }: { user: any; onUpdate?: (data:
       const apiPath = tab.name === 'Intel' ? '/api/intel-tabs' : '/api/tribe-tabs';
       
       // Start fetching data
-      const dataPromise = fetch(apiPath).then(res => res.json());
+      const dataPromise = fetch(apiPath, { credentials: 'include' }).then(res => res.json());
       
       // Wait for at least 2 seconds
       const delayPromise = new Promise(resolve => setTimeout(resolve, 2000));

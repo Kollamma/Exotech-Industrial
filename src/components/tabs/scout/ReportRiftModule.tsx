@@ -3,19 +3,19 @@ import { DebugLabel } from "../../../context/DebugContext";
 import { AutocompleteInput } from "../../AutocompleteInput";
 import { CornerAccents } from "./ScoutUI";
 
-export const IsolateModule = ({ 
+export const ReportRiftModule = ({ 
   isMobile, 
-  onIsolateSuccess 
+  onReportSuccess 
 }: { 
   isMobile?: boolean;
-  onIsolateSuccess: () => void;
+  onReportSuccess: () => void;
 }) => {
-  const [isolateSystemId, setIsolateSystemId] = useState("");
+  const [systemId, setSystemId] = useState("");
   const [selectedRift, setSelectedRift] = useState<string | null>(null);
-  const [isIsolating, setIsIsolating] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
 
-  const handleIsolate = async () => {
-    if (!isolateSystemId.trim()) {
+  const handleReport = async () => {
+    if (!systemId.trim()) {
       alert("SYSTEM ID REQUIRED");
       return;
     }
@@ -24,28 +24,32 @@ export const IsolateModule = ({
       return;
     }
 
-    setIsIsolating(true);
+    setIsReporting(true);
     try {
       const res = await fetch('/api/rifts/log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          system_id: isolateSystemId,
+          system_id: systemId,
           type: selectedRift.replace(/>_/g, '')
-        })
+        }),
+        credentials: 'include'
       });
 
-      if (!res.ok) throw new Error("Isolation failed");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Reporting failed");
+      }
 
-      setIsolateSystemId("");
+      setSystemId("");
       setSelectedRift(null);
       alert("RIFT LOGGED SUCCESSFULLY");
-      onIsolateSuccess();
-    } catch (e) {
+      onReportSuccess();
+    } catch (e: any) {
       console.error(e);
-      alert("ISOLATION FAILED");
+      alert(`REPORTING FAILED: ${e.message}`);
     } finally {
-      setIsIsolating(false);
+      setIsReporting(false);
     }
   };
 
@@ -53,13 +57,13 @@ export const IsolateModule = ({
     return (
       <div className="space-y-4">
         <div className="text-[10px] uppercase tracking-[0.3em] text-text-main font-bold border-b border-accent/20 pb-1">
-          Rift Isolation
+          Report New Rift Location
         </div>
         <AutocompleteInput 
           placeholder="SYSTEM ID" 
           maxLength={10}
-          value={isolateSystemId}
-          onChange={(val) => setIsolateSystemId(val.toUpperCase())}
+          value={systemId}
+          onChange={(val) => setSystemId(val.toUpperCase())}
           className="w-full bg-bg-main border border-accent/30 p-4 text-sm text-text-main uppercase tracking-[0.2em] outline-none focus:border-accent"
         />
 
@@ -82,18 +86,18 @@ export const IsolateModule = ({
         </div>
 
         <button 
-          onClick={handleIsolate}
-          disabled={isIsolating}
+          onClick={handleReport}
+          disabled={isReporting}
           className="w-full py-4 text-sm uppercase tracking-[0.2em] border-2 border-accent text-text-accent font-black transition-all disabled:opacity-50"
         >
-          {isIsolating ? "Isolating..." : ">_ Report New Rift"}
+          {isReporting ? "Reporting..." : ">_ Report Rift Location"}
         </button>
       </div>
     );
   }
 
   return (
-    <DebugLabel label="Isolate Module" className="flex-[3]">
+    <DebugLabel label="Report Rift Module" className="flex-[3]">
       <div className="border border-accent/20 bg-bg-main/50 p-1 flex flex-col space-y-1">
         <div className="flex items-center justify-start gap-4 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
@@ -101,19 +105,19 @@ export const IsolateModule = ({
               <AutocompleteInput 
                 placeholder="SYSTEM ID" 
                 maxLength={10}
-                value={isolateSystemId}
-                onChange={(val) => setIsolateSystemId(val.toUpperCase())}
+                value={systemId}
+                onChange={(val) => setSystemId(val.toUpperCase())}
                 className="w-28 bg-bg-main border border-accent/20 p-2.5 text-[11px] text-text-main uppercase tracking-[0.2em] outline-none focus:border-accent/60 transition-all placeholder:text-zinc-500"
               />
             </DebugLabel>
-            <DebugLabel label="Isolate Button">
+            <DebugLabel label="Report Button">
               <button 
-                onClick={handleIsolate}
-                disabled={isIsolating}
+                onClick={handleReport}
+                disabled={isReporting}
                 className="relative px-8 py-2.5 text-[11px] uppercase tracking-[0.05em] border border-accent bg-accent/10 text-text-accent font-medium rounded-sm hover:bg-accent/20 transition-all active:scale-[0.98] shadow-[0_0_20px_rgba(255,99,33,0.15)] whitespace-nowrap disabled:opacity-50"
               >
                 <CornerAccents color="white" />
-                {isIsolating ? ">_ REPORTING..." : ">_ Report New Rift"}
+                {isReporting ? ">_ REPORTING..." : ">_ Report Rift Location"}
               </button>
             </DebugLabel>
           </div>

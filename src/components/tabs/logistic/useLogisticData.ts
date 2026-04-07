@@ -10,10 +10,10 @@ export const useLogisticData = (isAdmin: boolean) => {
 
   const fetchGates = async () => {
     try {
-      const metaRes = await fetch("/api/gates");
+      const metaRes = await fetch("/api/gates", { credentials: 'include' });
       const metaData = await metaRes.json();
 
-      const foamRes = await fetch("/api/logistic/gates");
+      const foamRes = await fetch("/api/logistic/gates", { credentials: 'include' });
       const foamData = await foamRes.json();
 
       if (Array.isArray(metaData)) {
@@ -37,7 +37,7 @@ export const useLogisticData = (isAdmin: boolean) => {
   const fetchUsers = async () => {
     if (!isAdmin) return;
     try {
-      const res = await fetch("/api/users");
+      const res = await fetch("/api/users", { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
         setAllUsers(data);

@@ -56,7 +56,8 @@ export const ManifestForm = ({
           amount: Number(quantity),
           target_id: selectedTarget || null,
           notes: notes
-        })
+        }),
+        credentials: 'include'
       });
 
       if (!res.ok) throw new Error("Contribution failed");

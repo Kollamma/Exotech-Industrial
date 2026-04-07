@@ -14,7 +14,7 @@ export const UserManagementModal = ({ isOpen, onClose }: { isOpen: boolean; onCl
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("/api/users");
+      const res = await fetch("/api/users", { credentials: 'include' });
       const data = await res.json();
       if (Array.isArray(data)) {
         setUsers(data);
@@ -43,7 +43,8 @@ export const UserManagementModal = ({ isOpen, onClose }: { isOpen: boolean; onCl
       const res = await fetch("/api/users/rank", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target_uid: targetUid, rank: newRank })
+        body: JSON.stringify({ target_uid: targetUid, rank: newRank }),
+        credentials: 'include'
       });
       if (res.ok) {
         fetchUsers();

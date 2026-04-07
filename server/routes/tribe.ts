@@ -2,15 +2,15 @@ import { Router } from "express";
 import { supabaseAdmin } from "../db";
 import { verifySession } from "../middleware";
 
-export const gatesRouter = Router();
+export const tribeRouter = Router();
 
-// API Route to get all gates
-gatesRouter.get("/", async (req, res) => {
+// API Routes for Tribe Tabs
+tribeRouter.get("/", async (req, res) => {
   try {
     const { data, error } = await supabaseAdmin
-      .from("gates")
+      .from("tribe_tabs")
       .select("*")
-      .order("name");
+      .order("position", { ascending: true });
 
     if (error) throw error;
     res.json(data);
@@ -19,60 +19,45 @@ gatesRouter.get("/", async (req, res) => {
   }
 });
 
-// API Route to add a gate
-gatesRouter.post("/", verifySession, async (req: any, res) => {
-  const { name, system_id, type, status } = req.body;
-
-  if (!name || !system_id || !type) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
+tribeRouter.post("/", verifySession, async (req: any, res) => {
+  const { title, content, position } = req.body;
   try {
     const { data, error } = await supabaseAdmin
-      .from("gates")
-      .insert({
-        name,
-        system_id,
-        type,
-        status: status || "active"
-      })
+      .from("tribe_tabs")
+      .insert({ title, content, position, visible: true })
       .select()
       .single();
 
     if (error) throw error;
-    res.json({ success: true, data });
+    res.json(data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// API Route to update a gate
-gatesRouter.put("/:id", verifySession, async (req: any, res) => {
+tribeRouter.put("/:id", verifySession, async (req: any, res) => {
   const { id } = req.params;
   const updates = req.body;
-
   try {
     const { data, error } = await supabaseAdmin
-      .from("gates")
+      .from("tribe_tabs")
       .update(updates)
       .eq("id", id)
       .select()
       .single();
 
     if (error) throw error;
-    res.json({ success: true, data });
+    res.json(data);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// API Route to delete a gate
-gatesRouter.delete("/:id", verifySession, async (req: any, res) => {
+tribeRouter.delete("/:id", verifySession, async (req: any, res) => {
   const { id } = req.params;
-
   try {
     const { error } = await supabaseAdmin
-      .from("gates")
+      .from("tribe_tabs")
       .delete()
       .eq("id", id);
 

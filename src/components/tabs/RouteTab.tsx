@@ -21,7 +21,7 @@ export const RouteTab = ({ user, initialData }: { user?: any; initialData?: any 
   const [copied, setCopied] = useState(false);
 
   const formatSystemName = (val: string) => {
-    return val.replace(/[^A-Z0-9]/gi, "").toUpperCase().slice(0, 6);
+    return val.replace(/[^A-Z0-9-]/gi, "").toUpperCase().slice(0, 8);
   };
 
   const handleJumpRangeChange = (val: string) => {
@@ -51,8 +51,7 @@ export const RouteTab = ({ user, initialData }: { user?: any; initialData?: any 
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     try {
-      const rawBaseUrl = import.meta.env.VITE_NAV_SERVICE_URL || "https://nav-service.railway.app";
-      const baseUrl = rawBaseUrl.replace(/\/+$/, "");
+      const baseUrl = "/api/navigation";
       const params = new URLSearchParams({
         start: startSystem.toUpperCase(),
         end: endSystem.toUpperCase(),
@@ -60,7 +59,7 @@ export const RouteTab = ({ user, initialData }: { user?: any; initialData?: any 
         mode: routeMode,
       });
 
-      console.log(`Polling navigation service at: ${baseUrl}/plan?${params.toString()}`);
+      console.log(`Requesting route from backend: ${baseUrl}/plan?${params.toString()}`);
       const response = await fetch(`${baseUrl}/plan?${params.toString()}`, {
         signal: controller.signal
       });

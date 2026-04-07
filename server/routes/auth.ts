@@ -18,6 +18,11 @@ authRouter.get("/url", (req, res) => {
   const clientId = process.env.DISCORD_CLIENT_ID;
   const baseUrl = process.env.APP_URL?.replace(/\/$/, "");
   
+  console.log("--- Auth URL Request ---");
+  console.log("Request Origin:", req.headers.origin);
+  console.log("Request Host:", req.get('host'));
+  console.log("Configured APP_URL:", process.env.APP_URL);
+  
   if (!clientId) {
     console.error("DISCORD_CLIENT_ID is not set in environment variables");
     return res.status(500).json({ error: "Discord Client ID is not configured" });
