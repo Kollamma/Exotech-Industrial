@@ -17,15 +17,14 @@ export async function calculateRoute(start: string, end: string, maxLy: string |
   let baseUrl = rawBaseUrl.replace(/\/+$/, "");
   const password = process.env.NAV_SERVICE_PASSWORD;
 
-  // Format system names exactly like the frontend
-  const formatSystem = (val: string) => val.trim().replace(/[^A-Z0-9-]/gi, "").toUpperCase().slice(0, 8);
-  const formattedStart = formatSystem(start);
-  const formattedEnd = formatSystem(end);
+  // Clean inputs - matching the web app's formatting logic
+  const formattedStart = start.trim().toUpperCase().replace(/[^A-Z0-9-]/gi, "").slice(0, 8);
+  const formattedEnd = end.trim().toUpperCase().replace(/[^A-Z0-9-]/gi, "").slice(0, 8);
 
-  // Handle case where user might have included /plan in the URL
+  // Ensure we hit the /plan endpoint correctly
   const endpoint = baseUrl.endsWith("/plan") ? baseUrl : `${baseUrl}/plan`;
 
-  console.log(`Navigation Service: Requesting route from ${endpoint} for ${formattedStart} -> ${formattedEnd}`);
+  console.log(`[NAV SERVICE] Requesting: ${endpoint}?start=${formattedStart}&end=${formattedEnd}&max_ly=${maxLy}&mode=${mode}`);
 
   const headers: Record<string, string> = {};
   if (password) {
@@ -39,10 +38,11 @@ export async function calculateRoute(start: string, end: string, maxLy: string |
         start: formattedStart,
         end: formattedEnd,
         max_ly: maxLy.toString(),
+        range: maxLy.toString(), // Fallback for older Python tool versions
         mode
       },
       headers,
-      timeout: 20000 // Increased timeout to 20s
+      timeout: 20000
     });
 
     const data = response.data;
@@ -54,6 +54,7 @@ export async function calculateRoute(start: string, end: string, maxLy: string |
     let route = data.route;
     const total_distance = data.total_distance || 0;
 
+    // Fallback if the service returns a simple path array
     if (!route && data.path && Array.isArray(data.path)) {
       route = data.path.map((name: string, index: number) => ({
         name,
@@ -64,10 +65,10 @@ export async function calculateRoute(start: string, end: string, maxLy: string |
     }
 
     if (!route || !Array.isArray(route)) {
-      throw new Error("Invalid response from navigation service: No route found");
+      throw new Error("Navigation service returned a successful response but no route data was found.");
     }
 
-    // Ensure all steps have ingame_link and proper formatting
+    // Normalize the route data
     const normalizedRoute = route.map((step: any) => ({
       name: step.name || step.system_id || step.systemName,
       dist: typeof step.dist === 'number' ? step.dist : 0,
@@ -80,15 +81,9 @@ export async function calculateRoute(start: string, end: string, maxLy: string |
       total_distance
     };
   } catch (err: any) {
-    if (err.response?.data?.error) {
-      throw new Error(err.response.data.error);
-    }
-    if (err.response?.data?.message) {
-      throw new Error(err.response.data.message);
-    }
-    if (err.code === 'ECONNABORTED') {
-      throw new Error("Navigation service timed out after 20 seconds.");
-    }
-    throw err;
+    // Extract the most useful error message
+    const message = err.response?.data?.error || err.response?.data?.message || err.message;
+    console.error(`[NAV SERVICE ERROR] ${message}`);
+    throw new Error(message);
   }
 }
